@@ -1,21 +1,36 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
+
 <head>
 <meta charset="UTF-8">
 <title>داده زنده بازار</title>
 
 <style>
+
+body {
+    direction: rtl;
+    font-family: Tahoma, Arial;
+}
+
 table {
     border-collapse: collapse;
     width: 100%;
 }
+
 td, th {
     border: 1px solid #999;
     padding: 8px;
+    text-align: center;
 }
+
+th {
+    background-color: #eee;
+}
+
 </style>
 
 </head>
+
 
 <body>
 
@@ -23,38 +38,98 @@ td, th {
 
 <table id="data"></table>
 
+
 <script>
 
 const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRULrojEZLgtKk-T0DkFu0fJlXZoWystL0wYlDEwv78YIN1Q-1HmEMQny8lSYBITNPMHp-3Ym638D_y/pub?output=csv";
 
+
 fetch(url)
+
 .then(response => response.text())
+
 .then(csv => {
+
 
     let rows = csv.split("\n");
 
+
+    // پیدا کردن ردیف Header واقعی
+    let headerIndex = rows.findIndex(row => row.includes("نماد"));
+
+
+    if (headerIndex === -1) {
+
+        alert("Header پیدا نشد");
+
+        return;
+
+    }
+
+
+    // حذف ردیف های توضیحی قبل از جدول
+    rows = rows.slice(headerIndex);
+
+
+
     let table = document.getElementById("data");
+
+
 
     rows.forEach((row, index) => {
 
+
         let tr = document.createElement("tr");
+
+
 
         row.split(",").forEach(cell => {
 
-            let element = index === 0 ? document.createElement("th") : document.createElement("td");
 
-            element.innerText = cell;
+            let element;
+
+
+            if (index === 0) {
+
+                element = document.createElement("th");
+
+            } 
+            else {
+
+                element = document.createElement("td");
+
+            }
+
+
+
+            element.innerText = cell.replace(/"/g, "");
+
             tr.appendChild(element);
+
 
         });
 
+
+
         table.appendChild(tr);
+
 
     });
 
+
+
+})
+
+.catch(error => {
+
+    console.log(error);
+
 });
+
 
 </script>
 
+
 </body>
+
 </html>
