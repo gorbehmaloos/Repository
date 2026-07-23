@@ -10,14 +10,33 @@ let sortDirection = 1;
 
 
 
+
+function persianToEnglish(str){
+
+    if(!str) return "";
+
+    return str
+    .replace(/[۰-۹]/g,function(d){
+        return "۰۱۲۳۴۵۶۷۸۹".indexOf(d);
+    })
+    .replace(/,/g,"")
+    .trim();
+
+}
+
+
+
+
+
+
 function loadData(){
 
 
 fetch(url)
 
-.then(response => response.text())
+.then(response=>response.text())
 
-.then(csv => {
+.then(csv=>{
 
 
 let rows = csv.split("\n");
@@ -25,11 +44,11 @@ let rows = csv.split("\n");
 
 
 let headerIndex =
-rows.findIndex(row => row.includes("نماد"));
+rows.findIndex(row=>row.includes("نماد"));
 
 
 
-if(headerIndex === -1)
+if(headerIndex===-1)
 return;
 
 
@@ -47,7 +66,7 @@ rows[0]
 
 marketData =
 rows.slice(1)
-.map(row =>
+.map(row=>
 row.split(",")
 .map(x=>x.replace(/"/g,"").trim())
 );
@@ -67,12 +86,7 @@ new Date().toLocaleTimeString("fa-IR");
 
 });
 
-
-
 }
-
-
-
 
 
 
@@ -80,15 +94,20 @@ new Date().toLocaleTimeString("fa-IR");
 function formatNumber(value){
 
 
-if(value==="" || isNaN(value))
+let num =
+persianToEnglish(value);
+
+
+
+if(num==="" || isNaN(num))
 return value;
 
 
-return Number(value).toLocaleString("en-US");
+
+return Number(num).toLocaleString("en-US");
 
 
 }
-
 
 
 
@@ -103,9 +122,13 @@ let table =
 document.getElementById(id);
 
 
+
 table.innerHTML="";
 
 
+
+
+// Header
 
 let tr =
 document.createElement("tr");
@@ -119,7 +142,29 @@ let th =
 document.createElement("th");
 
 
+
 th.innerText=h;
+
+
+
+if(sortColumn===index){
+
+
+let arrow =
+document.createElement("span");
+
+arrow.className="sort-arrow";
+
+
+arrow.innerText =
+sortDirection===1 ? " ▲" : " ▼";
+
+
+th.appendChild(arrow);
+
+
+}
+
 
 
 
@@ -145,17 +190,23 @@ table.appendChild(tr);
 
 
 
+
+// Rows
+
+
 data.forEach(row=>{
 
 
-let tr=document.createElement("tr");
+let tr =
+document.createElement("tr");
 
 
 
 row.forEach((cell,index)=>{
 
 
-let td=document.createElement("td");
+let td =
+document.createElement("td");
 
 
 
@@ -166,32 +217,37 @@ let value=cell;
 if(headers[index].includes("درصد")){
 
 
-let num=parseFloat(cell);
+let num =
+Number(persianToEnglish(cell));
 
 
 
 if(num>0)
+
 td.classList.add("positive");
 
 
+
 if(num<0)
+
 td.classList.add("negative");
 
 
 
 }
 
+
+
 else{
 
-
 value=formatNumber(cell);
-
 
 }
 
 
 
 td.innerText=value;
+
 
 
 tr.appendChild(td);
@@ -211,7 +267,6 @@ table.appendChild(tr);
 
 
 }
-
 
 
 
@@ -256,15 +311,18 @@ x=>x.includes("آخرین معامله - درصد")
 marketData.forEach(row=>{
 
 
-let value=parseFloat(row[index]);
+let value =
+Number(persianToEnglish(row[index]));
 
 
 
 if(value>0)
+
 positive++;
 
 
 if(value<0)
+
 negative++;
 
 
@@ -273,23 +331,20 @@ negative++;
 
 
 
-document.getElementById("totalCount")
-.innerText=marketData.length;
+document.getElementById("totalCount").innerText =
+marketData.length;
 
 
-
-document.getElementById("positiveCount")
-.innerText=positive;
-
+document.getElementById("positiveCount").innerText =
+positive;
 
 
-document.getElementById("negativeCount")
-.innerText=negative;
+document.getElementById("negativeCount").innerText =
+negative;
 
 
 
 }
-
 
 
 
@@ -347,15 +402,15 @@ createTable(result,"searchTable");
 
 
 
-// مرتب سازی ستون‌ها
-
 
 function sortTable(column){
+
 
 
 if(sortColumn===column)
 
 sortDirection *= -1;
+
 
 else{
 
@@ -367,18 +422,25 @@ sortDirection=1;
 
 
 
-marketData.sort((a,b)=>{
 
-
-let x=a[column];
-
-let y=b[column];
+marketData.sort(function(a,b){
 
 
 
-let nx=parseFloat(x.replace(/,/g,""));
+let x =
+persianToEnglish(a[column]);
 
-let ny=parseFloat(y.replace(/,/g,""));
+
+let y =
+persianToEnglish(b[column]);
+
+
+
+
+let nx = Number(x);
+
+let ny = Number(y);
+
 
 
 
@@ -389,6 +451,7 @@ return (nx-ny)*sortDirection;
 
 
 }
+
 
 
 
@@ -403,6 +466,7 @@ return x.localeCompare(y)*sortDirection;
 updateMarketTable();
 
 
+
 }
 
 
@@ -410,17 +474,11 @@ updateMarketTable();
 
 
 
-
-
-// اجرای اولیه
-
-
 loadData();
 
 
 
-// بروزرسانی هر 60 ثانیه
-
+// هر 60 ثانیه
 
 setInterval(
 loadData,
