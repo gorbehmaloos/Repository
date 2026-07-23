@@ -20,14 +20,16 @@ h1 {
 
 .table-container {
     overflow-x: auto;
-    width: 100%;
+    overflow-y: auto;
+    max-width: 100%;
+    max-height: 80vh;
+    border: 1px solid #999;
 }
 
 
 table {
     border-collapse: collapse;
-    width: max-content;
-    min-width: 100%;
+    min-width: 2500px;
 }
 
 
@@ -36,6 +38,7 @@ td, th {
     padding: 8px;
     text-align: center;
     white-space: nowrap;
+    background: white;
 }
 
 
@@ -43,19 +46,45 @@ th {
     background-color: #eeeeee;
     position: sticky;
     top: 0;
-    z-index: 2;
+    z-index: 3;
 }
 
 
+/* ثابت کردن ستون نماد */
+
+td:first-child,
+th:first-child {
+
+    position: sticky;
+    right: 0;
+    z-index: 2;
+    background: white;
+
+}
+
+
+th:first-child {
+
+    z-index: 5;
+    background-color: #eeeeee;
+
+}
+
+
+
 .positive {
+
     color: green;
     font-weight: bold;
+
 }
 
 
 .negative {
+
     color: red;
     font-weight: bold;
+
 }
 
 
@@ -92,14 +121,12 @@ fetch(url)
 .then(csv => {
 
 
-
 let rows = csv.split("\n");
 
 
+// پیدا کردن Header واقعی
 
-// پیدا کردن Header
 let headerIndex = rows.findIndex(row => row.includes("نماد"));
-
 
 
 if(headerIndex === -1){
@@ -111,8 +138,7 @@ return;
 }
 
 
-
-// حذف توضیحات قبل از جدول
+// حذف ردیف‌های قبل از Header
 
 rows = rows.slice(headerIndex);
 
@@ -122,14 +148,10 @@ let table = document.getElementById("data");
 
 
 
-// ساخت جدول
-
-
 rows.forEach((row,index)=>{
 
 
 let tr = document.createElement("tr");
-
 
 
 let cells = row.split(",");
@@ -140,7 +162,6 @@ cells.forEach((cell,col)=>{
 
 
 let element;
-
 
 
 if(index===0){
@@ -159,13 +180,11 @@ element=document.createElement("td");
 cell = cell.replace(/"/g,"").trim();
 
 
-
 element.innerText = cell;
 
 
 
 // ستون درصد آخرین معامله
-// ستون شماره 9 است
 
 if(index>0 && col===9){
 
@@ -173,20 +192,18 @@ if(index>0 && col===9){
 let value = parseFloat(cell);
 
 
-
-if(value>0){
+if(value > 0){
 
 element.classList.add("positive");
 
 }
 
 
-if(value<0){
+if(value < 0){
 
 element.classList.add("negative");
 
 }
-
 
 
 }
@@ -194,7 +211,6 @@ element.classList.add("negative");
 
 
 tr.appendChild(element);
-
 
 
 });
@@ -208,8 +224,8 @@ table.appendChild(tr);
 });
 
 
-
 })
+
 
 .catch(error=>{
 
@@ -220,7 +236,6 @@ console.log(error);
 
 
 </script>
-
 
 
 </body>
