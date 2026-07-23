@@ -1,243 +1,145 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
-
 <head>
-<meta charset="UTF-8">
-<title>داده زنده بازار</title>
+    <meta charset="UTF-8">
 
-<style>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-body {
-    direction: rtl;
-    font-family: Tahoma, Arial;
-    margin: 20px;
-}
+    <meta
+        name="description"
+        content="دیده‌بان آنلاین بازار بورس ایران"
+    >
 
-h1 {
-    text-align: center;
-}
+    <title>دیده‌بان بازار بورس</title>
 
-
-.table-container {
-    overflow-x: auto;
-    overflow-y: auto;
-    max-width: 100%;
-    max-height: 80vh;
-    border: 1px solid #999;
-}
-
-
-table {
-    border-collapse: collapse;
-    min-width: 2500px;
-}
-
-
-td, th {
-    border: 1px solid #999;
-    padding: 8px;
-    text-align: center;
-    white-space: nowrap;
-    background: white;
-}
-
-
-th {
-    background-color: #eeeeee;
-    position: sticky;
-    top: 0;
-    z-index: 3;
-}
-
-
-/* ثابت کردن ستون نماد */
-
-td:first-child,
-th:first-child {
-
-    position: sticky;
-    right: 0;
-    z-index: 2;
-    background: white;
-
-}
-
-
-th:first-child {
-
-    z-index: 5;
-    background-color: #eeeeee;
-
-}
-
-
-
-.positive {
-
-    color: green;
-    font-weight: bold;
-
-}
-
-
-.negative {
-
-    color: red;
-    font-weight: bold;
-
-}
-
-
-</style>
-
+    <link rel="stylesheet" href="style.css">
 </head>
-
 
 <body>
 
-
-<h1>داده Google Sheet</h1>
-
-
-<div class="table-container">
-
-<table id="data"></table>
-
-</div>
-
-
-
-<script>
-
-
-const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRULrojEZLgtKk-T0DkFu0fJlXZoWystL0wYlDEwv78YIN1Q-1HmEMQny8lSYBITNPMHp-3Ym638D_y/pub?output=csv";
-
-
-
-fetch(url)
-
-.then(response => response.text())
-
-.then(csv => {
-
-
-let rows = csv.split("\n");
-
-
-// پیدا کردن Header واقعی
-
-let headerIndex = rows.findIndex(row => row.includes("نماد"));
-
-
-if(headerIndex === -1){
-
-alert("Header پیدا نشد");
-
-return;
-
-}
-
-
-// حذف ردیف‌های قبل از Header
-
-rows = rows.slice(headerIndex);
-
-
-
-let table = document.getElementById("data");
-
-
-
-rows.forEach((row,index)=>{
-
-
-let tr = document.createElement("tr");
-
-
-let cells = row.split(",");
-
-
-
-cells.forEach((cell,col)=>{
-
-
-let element;
-
-
-if(index===0){
-
-element=document.createElement("th");
-
-}
-else{
-
-element=document.createElement("td");
-
-}
-
-
-
-cell = cell.replace(/"/g,"").trim();
-
-
-element.innerText = cell;
-
-
-
-// ستون درصد آخرین معامله
-
-if(index>0 && col===9){
-
-
-let value = parseFloat(cell);
-
-
-if(value > 0){
-
-element.classList.add("positive");
-
-}
-
-
-if(value < 0){
-
-element.classList.add("negative");
-
-}
-
-
-}
-
-
-
-tr.appendChild(element);
-
-
-});
-
-
-
-table.appendChild(tr);
-
-
-
-});
-
-
-})
-
-
-.catch(error=>{
-
-console.log(error);
-
-});
-
-
-
-</script>
-
-
+    <header class="page-header">
+        <div>
+            <h1>دیده‌بان بازار بورس</h1>
+            <p class="page-description">
+                نمایش اطلاعات بازار از Google Sheet
+            </p>
+        </div>
+
+        <button id="refreshButton" class="refresh-button" type="button">
+            بروزرسانی اطلاعات
+        </button>
+    </header>
+
+    <main>
+
+        <!-- وضعیت دریافت اطلاعات -->
+        <section class="status-section">
+            <div id="statusMessage" class="status loading">
+                در حال دریافت اطلاعات بازار...
+            </div>
+
+            <div class="update-information">
+                آخرین بروزرسانی:
+                <span id="lastUpdate">—</span>
+            </div>
+        </section>
+
+        <!-- کارت‌های آماری -->
+        <section class="market-summary" aria-label="خلاصه وضعیت بازار">
+
+            <article class="summary-card total-card">
+                <span class="summary-title">تعداد کل نمادها</span>
+                <strong id="totalCount" class="summary-value">۰</strong>
+            </article>
+
+            <article class="summary-card positive-card">
+                <span class="summary-title">نمادهای مثبت</span>
+                <strong id="positiveCount" class="summary-value">۰</strong>
+            </article>
+
+            <article class="summary-card negative-card">
+                <span class="summary-title">نمادهای منفی</span>
+                <strong id="negativeCount" class="summary-value">۰</strong>
+            </article>
+
+            <article class="summary-card neutral-card">
+                <span class="summary-title">بدون تغییر</span>
+                <strong id="neutralCount" class="summary-value">۰</strong>
+            </article>
+
+        </section>
+
+        <!-- جستجو -->
+        <section class="search-section">
+            <label for="searchInput">جستجوی نماد یا نام شرکت</label>
+
+            <div class="search-box">
+                <input
+                    id="searchInput"
+                    type="search"
+                    placeholder="برای مثال: خودرو یا ایران خودرو"
+                    autocomplete="off"
+                >
+
+                <button
+                    id="clearSearchButton"
+                    class="clear-search-button"
+                    type="button"
+                >
+                    پاک کردن
+                </button>
+            </div>
+        </section>
+
+        <!-- نتایج جستجو -->
+        <section id="searchResultsSection" class="search-results-section hidden">
+            <div class="section-heading">
+                <h2>نتایج جستجو</h2>
+
+                <span id="searchResultCount" class="result-count">
+                    ۰ نتیجه
+                </span>
+            </div>
+
+            <div class="table-container search-table-container">
+                <table id="searchTable">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div id="noSearchResult" class="empty-message hidden">
+                نمادی با این عبارت پیدا نشد.
+            </div>
+        </section>
+
+        <!-- جدول اصلی -->
+        <section class="main-table-section">
+            <div class="section-heading">
+                <h2>اطلاعات بازار</h2>
+
+                <span class="sort-help">
+                    برای مرتب‌سازی روی عنوان ستون کلیک کنید.
+                </span>
+            </div>
+
+            <div class="table-container">
+                <table id="marketTable">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="page-footer">
+        بروزرسانی خودکار اطلاعات هر ۶۰ ثانیه انجام می‌شود.
+    </footer>
+
+    <script src="script.js" defer></script>
 </body>
-
 </html>
