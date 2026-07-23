@@ -10,22 +10,54 @@
 body {
     direction: rtl;
     font-family: Tahoma, Arial;
+    margin: 20px;
 }
+
+h1 {
+    text-align: center;
+}
+
+
+.table-container {
+    overflow-x: auto;
+    width: 100%;
+}
+
 
 table {
     border-collapse: collapse;
-    width: 100%;
+    width: max-content;
+    min-width: 100%;
 }
+
 
 td, th {
     border: 1px solid #999;
     padding: 8px;
     text-align: center;
+    white-space: nowrap;
 }
 
+
 th {
-    background-color: #eee;
+    background-color: #eeeeee;
+    position: sticky;
+    top: 0;
+    z-index: 2;
 }
+
+
+.positive {
+    color: green;
+    font-weight: bold;
+}
+
+
+.negative {
+    color: red;
+    font-weight: bold;
+}
+
 
 </style>
 
@@ -34,14 +66,23 @@ th {
 
 <body>
 
+
 <h1>داده Google Sheet</h1>
 
+
+<div class="table-container">
+
 <table id="data"></table>
+
+</div>
+
 
 
 <script>
 
+
 const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRULrojEZLgtKk-T0DkFu0fJlXZoWystL0wYlDEwv78YIN1Q-1HmEMQny8lSYBITNPMHp-3Ym638D_y/pub?output=csv";
+
 
 
 fetch(url)
@@ -51,83 +92,135 @@ fetch(url)
 .then(csv => {
 
 
-    let rows = csv.split("\n");
 
-
-    // پیدا کردن ردیف Header واقعی
-    let headerIndex = rows.findIndex(row => row.includes("نماد"));
-
-
-    if (headerIndex === -1) {
-
-        alert("Header پیدا نشد");
-
-        return;
-
-    }
-
-
-    // حذف ردیف های توضیحی قبل از جدول
-    rows = rows.slice(headerIndex);
+let rows = csv.split("\n");
 
 
 
-    let table = document.getElementById("data");
+// پیدا کردن Header
+let headerIndex = rows.findIndex(row => row.includes("نماد"));
 
 
 
-    rows.forEach((row, index) => {
+if(headerIndex === -1){
 
+alert("Header پیدا نشد");
 
-        let tr = document.createElement("tr");
+return;
 
-
-
-        row.split(",").forEach(cell => {
-
-
-            let element;
-
-
-            if (index === 0) {
-
-                element = document.createElement("th");
-
-            } 
-            else {
-
-                element = document.createElement("td");
-
-            }
+}
 
 
 
-            element.innerText = cell.replace(/"/g, "");
+// حذف توضیحات قبل از جدول
 
-            tr.appendChild(element);
-
-
-        });
+rows = rows.slice(headerIndex);
 
 
 
-        table.appendChild(tr);
+let table = document.getElementById("data");
 
 
-    });
+
+// ساخت جدول
+
+
+rows.forEach((row,index)=>{
+
+
+let tr = document.createElement("tr");
+
+
+
+let cells = row.split(",");
+
+
+
+cells.forEach((cell,col)=>{
+
+
+let element;
+
+
+
+if(index===0){
+
+element=document.createElement("th");
+
+}
+else{
+
+element=document.createElement("td");
+
+}
+
+
+
+cell = cell.replace(/"/g,"").trim();
+
+
+
+element.innerText = cell;
+
+
+
+// ستون درصد آخرین معامله
+// ستون شماره 9 است
+
+if(index>0 && col===9){
+
+
+let value = parseFloat(cell);
+
+
+
+if(value>0){
+
+element.classList.add("positive");
+
+}
+
+
+if(value<0){
+
+element.classList.add("negative");
+
+}
+
+
+
+}
+
+
+
+tr.appendChild(element);
+
+
+
+});
+
+
+
+table.appendChild(tr);
+
+
+
+});
 
 
 
 })
 
-.catch(error => {
+.catch(error=>{
 
-    console.log(error);
+console.log(error);
 
 });
 
 
+
 </script>
+
 
 
 </body>
