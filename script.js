@@ -3,9 +3,8 @@ const url =
 
 
 let marketData = [];
-let headers = [];
-
 let filteredData = [];
+let headers = [];
 
 let sortColumn = -1;
 let sortDirection = 1;
@@ -30,6 +29,23 @@ function persianToEnglish(str){
 
 
 
+function formatNumber(value){
+
+    let num = persianToEnglish(value);
+
+
+    if(num==="" || isNaN(num))
+        return value;
+
+
+    return Number(num).toLocaleString("en-US");
+
+}
+
+
+
+
+
 function loadData(){
 
 
@@ -43,13 +59,14 @@ fetch(url)
 let rows = csv.split("\n");
 
 
+
 let headerIndex =
 rows.findIndex(row=>row.includes("نماد"));
 
 
 
 if(headerIndex===-1)
-return;
+    return;
 
 
 
@@ -64,28 +81,6 @@ rows[0]
 
 
 
-// تغییر نام ستون‌ها
-
-headers = headers.map(h=>{
-
-
-if(h==="EPS")
-return "EPS TTM";
-
-
-if(h==="P/E")
-return "P/E TTM";
-
-
-return h;
-
-
-});
-
-
-
-
-
 marketData =
 rows.slice(1)
 .map(row=>
@@ -97,7 +92,7 @@ row.split(",")
 
 
 
-filteredData = [...marketData];
+filteredData=[...marketData];
 
 
 
@@ -111,32 +106,7 @@ document.getElementById("lastUpdate").innerText =
 new Date().toLocaleTimeString("fa-IR");
 
 
-
 });
-
-
-}
-
-
-
-
-
-
-
-function formatNumber(value){
-
-
-let num =
-persianToEnglish(value);
-
-
-
-if(num==="" || isNaN(num))
-return value;
-
-
-
-return Number(num).toLocaleString("en-US");
 
 
 }
@@ -175,16 +145,16 @@ th.innerText=h;
 if(sortColumn===index){
 
 
-let arrow=document.createElement("span");
+let span=document.createElement("span");
 
-arrow.className="sort-arrow";
+span.className="sort-arrow";
 
 
-arrow.innerText =
+span.innerText =
 sortDirection===1 ? " ▲" : " ▼";
 
 
-th.appendChild(arrow);
+th.appendChild(span);
 
 
 }
@@ -208,11 +178,7 @@ tr.appendChild(th);
 
 
 table.appendChild(tr);
-
-
-
-
-data.forEach(row=>{
+    data.forEach(row=>{
 
 
 let tr=document.createElement("tr");
@@ -223,6 +189,7 @@ row.forEach((cell,index)=>{
 
 
 let td=document.createElement("td");
+
 
 let value=cell;
 
@@ -235,25 +202,33 @@ let n =
 Number(persianToEnglish(cell));
 
 
+
 if(n>0)
+
 td.classList.add("positive");
 
 
+
 if(n<0)
+
 td.classList.add("negative");
 
 
 }
 
+
 else{
 
+
 value=formatNumber(cell);
+
 
 }
 
 
 
 td.innerText=value;
+
 
 tr.appendChild(td);
 
@@ -268,14 +243,30 @@ table.appendChild(tr);
 
 
 });
-function updateMarketTable(){
 
-    createTable(
-        filteredData,
-        "marketTable"
-    );
+
 
 }
+
+
+
+
+
+
+
+
+function updateMarketTable(){
+
+
+createTable(
+filteredData,
+"marketTable"
+);
+
+
+}
+
+
 
 
 
@@ -302,7 +293,9 @@ marketData.forEach(row=>{
 
 
 let value =
-Number(persianToEnglish(row[index]));
+Number(
+persianToEnglish(row[index])
+);
 
 
 
@@ -346,7 +339,37 @@ negative;
 
 
 
-// جستجوی نماد یا نام
+// فعال کردن فیلتر
+
+function setActiveFilter(buttonId){
+
+
+document
+.querySelectorAll(".filters button")
+.forEach(btn=>{
+
+btn.classList.remove("active");
+
+});
+
+
+
+document
+.getElementById(buttonId)
+.classList.add("active");
+
+
+}
+
+
+
+
+
+
+
+
+
+// جستجو
 
 
 document
@@ -361,9 +384,11 @@ let text=this.value.trim();
 
 if(text===""){
 
+
 document.getElementById("searchTable").innerHTML="";
 
 return;
+
 
 }
 
@@ -378,26 +403,27 @@ return row[0].includes(text)
 row[1].includes(text);
 
 
+});
+
+
+
+createTable(
+result,
+"searchTable"
+);
+
+
 
 });
 
 
 
-createTable(result,"searchTable");
-
-
-
-});
 
 
 
 
 
-
-
-
-
-// مرتب سازی ستون‌ها
+// مرتب سازی
 
 
 function sortTable(column){
@@ -406,7 +432,7 @@ function sortTable(column){
 
 if(sortColumn===column)
 
-sortDirection *= -1;
+sortDirection*=-1;
 
 
 
@@ -420,13 +446,13 @@ sortDirection=1;
 
 
 
-
 filteredData.sort(function(a,b){
 
 
 
 let x =
 persianToEnglish(a[column]);
+
 
 
 let y =
@@ -461,27 +487,14 @@ return x.localeCompare(y)*sortDirection;
 updateMarketTable();
 
 
-
 }
-
-
-
-
-
-
-
-
-
-// پیدا کردن ستون‌ها
-
+// پیدا کردن شماره ستون
 
 function getColumn(name){
 
-
-return headers.findIndex(
-x=>x.includes(name)
-);
-
+    return headers.findIndex(
+        x=>x.includes(name)
+    );
 
 }
 
@@ -491,14 +504,14 @@ x=>x.includes(name)
 
 
 
-
-
-// فیلتر مثبت‌ها
-
+// فقط مثبت‌ها
 
 document
 .getElementById("positiveFilter")
 .onclick=function(){
+
+
+setActiveFilter("positiveFilter");
 
 
 let index =
@@ -513,7 +526,6 @@ marketData.filter(row=>{
 return Number(
 persianToEnglish(row[index])
 )>0;
-
 
 
 });
@@ -533,12 +545,14 @@ updateMarketTable();
 
 
 
-// فیلتر منفی‌ها
-
+// فقط منفی‌ها
 
 document
 .getElementById("negativeFilter")
 .onclick=function(){
+
+
+setActiveFilter("negativeFilter");
 
 
 let index =
@@ -553,7 +567,6 @@ marketData.filter(row=>{
 return Number(
 persianToEnglish(row[index])
 )<0;
-
 
 
 });
@@ -575,10 +588,12 @@ updateMarketTable();
 
 // صف خرید
 
-
 document
 .getElementById("buyQueueFilter")
 .onclick=function(){
+
+
+setActiveFilter("buyQueueFilter");
 
 
 
@@ -595,17 +610,22 @@ getColumn("قیمت پایانی - مقدار");
 
 
 
+
 filteredData =
 marketData.filter(row=>{
 
 
 return (
 
-Number(persianToEnglish(row[buyVolume]))>0
+Number(
+persianToEnglish(row[buyVolume])
+)>0
 
 &&
 
-persianToEnglish(row[buyPrice]) ===
+persianToEnglish(row[buyPrice])
+===
+
 persianToEnglish(row[closePrice])
 
 );
@@ -630,10 +650,12 @@ updateMarketTable();
 
 // صف فروش
 
-
 document
 .getElementById("sellQueueFilter")
 .onclick=function(){
+
+
+setActiveFilter("sellQueueFilter");
 
 
 
@@ -650,17 +672,22 @@ getColumn("قیمت پایانی - مقدار");
 
 
 
+
 filteredData =
 marketData.filter(row=>{
 
 
 return (
 
-Number(persianToEnglish(row[sellVolume]))>0
+Number(
+persianToEnglish(row[sellVolume])
+)>0
 
 &&
 
-persianToEnglish(row[sellPrice]) ===
+persianToEnglish(row[sellPrice])
+===
+
 persianToEnglish(row[closePrice])
 
 );
@@ -685,7 +712,6 @@ updateMarketTable();
 
 // حذف فیلتر
 
-
 document
 .getElementById("clearFilter")
 .onclick=function(){
@@ -695,7 +721,13 @@ document
 filteredData=[...marketData];
 
 
+
+setActiveFilter("clearFilter");
+
+
+
 updateMarketTable();
+
 
 
 };
@@ -715,11 +747,9 @@ loadData();
 
 
 
-// رفرش هر 60 ثانیه
+// رفرش خودکار هر 60 ثانیه
 
 setInterval(
 loadData,
 60000
 );
-
-}
