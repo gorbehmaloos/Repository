@@ -1,44 +1,64 @@
 body {
+
     direction: rtl;
+
     font-family: Tahoma, Arial, sans-serif;
+
     margin: 20px;
+
     background: #ffffff;
+
     color: #222;
+
 }
+
 
 
 h1 {
+
     text-align: center;
+
     margin-bottom: 20px;
+
 }
+
 
 
 h3 {
+
     margin-top: 25px;
+
 }
 
 
 
-/* نوار ابزار */
+
+/* نوار بالا */
 
 .toolbar {
 
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
+    display:flex;
 
-    gap: 20px;
+    justify-content:space-between;
+
+    align-items:center;
+
+    flex-wrap:wrap;
+
+    gap:20px;
 
 }
+
 
 
 
 .stats {
 
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
+    display:flex;
+
+    gap:10px;
+
+    flex-wrap:wrap;
 
 }
 
@@ -46,22 +66,19 @@ h3 {
 
 .stats span {
 
-    background: #f2f2f2;
+    background:#f2f2f2;
 
-    padding: 8px 12px;
+    padding:8px 12px;
 
-    border-radius: 6px;
-
-    font-size: 15px;
+    border-radius:6px;
 
 }
 
 
 
-
 .green {
 
-    color: green;
+    color:green;
 
     font-weight:bold;
 
@@ -97,6 +114,49 @@ h3 {
 
 
 
+/* دکمه های فیلتر */
+
+.filters {
+
+    margin-top:15px;
+
+    display:flex;
+
+    gap:10px;
+
+    flex-wrap:wrap;
+
+}
+
+
+
+.filters button {
+
+    padding:8px 14px;
+
+    border:1px solid #999;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+    background:#f8f8f8;
+
+    font-size:14px;
+
+}
+
+
+
+.filters button:hover {
+
+    background:#ddd;
+
+}
+
+
+
+
 
 /* جدول */
 
@@ -114,6 +174,7 @@ h3 {
 
 
 
+
 table {
 
     border-collapse:collapse;
@@ -123,8 +184,6 @@ table {
 }
 
 
-
-/* سلول‌ها */
 
 th,
 td {
@@ -138,71 +197,6 @@ td {
     white-space:nowrap;
 
 }
-
-
-
-
-/* عرض ستون‌های مهم */
-
-th:first-child,
-td:first-child {
-
-    min-width:100px;
-
-}
-
-
-th:nth-child(2),
-td:nth-child(2){
-
-    min-width:220px;
-
-}
-
-
-
-
-/* هدر */
-
-th {
-
-    position:sticky;
-
-    top:0;
-
-    background:#e8e8e8;
-
-    cursor:pointer;
-
-    z-index:5;
-
-    user-select:none;
-
-}
-
-
-
-th:hover {
-
-    background:#d5d5d5;
-
-}
-
-
-
-
-/* فلش مرتب سازی */
-
-.sort-arrow {
-
-    font-size:14px;
-
-    margin-right:5px;
-
-    color:#333;
-
-}
-
 
 
 
@@ -235,7 +229,67 @@ th:first-child {
 
 
 
-/* ردیف‌ها */
+/* عرض ستون های اول */
+
+th:first-child,
+td:first-child {
+
+    min-width:100px;
+
+}
+
+
+
+th:nth-child(2),
+td:nth-child(2){
+
+    min-width:220px;
+
+}
+
+
+
+
+/* هدر */
+
+th {
+
+    position:sticky;
+
+    top:0;
+
+    background:#e8e8e8;
+
+    cursor:pointer;
+
+    user-select:none;
+
+    z-index:5;
+
+}
+
+
+
+th:hover {
+
+    background:#d5d5d5;
+
+}
+
+
+
+
+.sort-arrow {
+
+    font-size:13px;
+
+    margin-right:5px;
+
+}
+
+
+
+
 
 tr:nth-child(even){
 
@@ -245,7 +299,7 @@ tr:nth-child(even){
 
 
 
-tr:hover{
+tr:hover {
 
     background:#fff2a8;
 
@@ -253,8 +307,6 @@ tr:hover{
 
 
 
-
-/* رنگ تغییرات */
 
 .positive {
 
